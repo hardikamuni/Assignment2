@@ -1,0 +1,93 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\title { INDIA INTERNET USAGE} 
+\author { Hardika Muni 
+\\ School of Information Technology 
+\\ Illinois State University
+\\
+\texttt{hmuni@ilstu.edu}}
+\date{\today} 
+\maketitle
+
+\section{Beginning of Internet in India}
+Internet first came to India in the year 1995. It was then growing slowly as many people were not aware of the Internet. Slowly the population was getting aware of the Internet and they started using it gradually. In 1998, it was just 0.01\% of the population of India was aware of internet whereas in United States at that time 31\% of the popluation of USA was using Internet. 
+In 2006, internet in India took a revolution change and thyere were more than 33 million of the population who were using Internet. By the end of 2012, internet had become one of the important commodity of the people in day-to-day life. But still only 12\% of the population is using internet whereas in USA 82\% of the population is using internet. 
+ 
+\section{Reading in the data}
+
+Reading the data from the Quandl source for India Internet Usage. Here we download the data from Quandl library and upload here in the R studio. We retreive Excel file using read.csv function and for that we need plyr library to be downloaded. 
+\subsection{Uncleaned Data}
+
+Data before getting cleaned. This is the data which we retreived from Quandl library which is not yet cleaned. 
+
+<<new, echo=FALSE>>=
+
+library(plyr)
+data<-read.csv(file="IWS-INDIAINTERNETSTATS.csv")
+
+head(data,13)
+
+@
+\subsection{Cleaned Data}
+
+Cleaned data after the uncleaned data is processed to get a proper data. Here , We remove the last column of the data which is not required as there is no data coming from that. Also, the population and users value is too large and so it displays in logarithmic form. To convert that, we used as.integer to convert the numeric into an integer form and hence it will display the complete data. This is also called scrubbing the data. Removing the unwanted columns and retaining the columns and rows which are most important. 
+
+<<Cleaned, echo=TRUE>>=
+data.new<-as.data.frame(data[,1:4])    
+
+data.new <- rename(data.new, c("X..Pen."="Percentage"))
+data.new$Users <- as.integer(as.numeric(data.new$Users))
+data.new$Population <- as.integer(as.numeric(data.new$Population))
+
+head(data.new,15)
+@
+
+\section{Data Section}
+Here, the class function displays the data frame. 
+Str function gives us the total number of observations, number of variables that is columns , each columns data type and their value. The summary function gives the Minimum and the Maximum value of the column , also it gives the median of the columns. This is very useful when we want to know about the values and the data types. 
+<<datasection, echo=TRUE>>=
+
+class(data.new)
+str(data.new)
+summary(data.new)
+@
+
+We need a graph below which shows two lines one for population and other for users. So, we use the melt function which will group the values according to YEAR and Percentage. To use the melt funtion we need to download reshape2 package and load that library before using the melt function. 
+
+<<melt, echo=TRUE>>=
+library(reshape2)
+data.long <- melt(data.new,id.vars=c("YEAR","Percentage"))
+
+head(data.long,27)
+@
+\section{Result}
+
+As per the graphs and the table below, it shows that there are not much users in India using Internet with respect to the population. It might be that many people are not aware of the internet facility and they might not know the advantages of it. Also, it is possible that some people cannot afford internet services because of lower class society. Also it is seen that the usage of internet is increasing every year and the graph predicts that in coming few years, there will be more than 50\% of the population in India who will be connected to internet and technology. 
+
+<<result, echo=TRUE>>=
+head(data.new,13)
+@
+\section{Graphs}
+Here we plot the Percentage of Internet users by Year. We do this using ggplot. For using ggplot, we eed to install ggplot2 package and then setup ggplot library. When using ggplot function, we first give the data frame name as given here in Figure 1 . Then in aes function we give the X axis and the Y axis and group it to 1 since we want a single line graph. Then we use a plus sign to concatinate and use geomline function which gives a straight line . By using geompoint function, at every value it also gives a point. We can use color function to specify the color of the line. 
+
+\begin{figure}
+
+<<linepercent,echo=FALSE, fig=TRUE>>=
+library(ggplot2)
+ggplot(data=data.new, aes(x=YEAR, y=Percentage, group=1)) + geom_line(color="red")+geom_point(color="red")
+
+@
+\caption{Percentage of users every Year}
+This is a 2 line graph in a single graph. For this we used the melt command before this. That will group the values according to Year and Percentage. The values we got there , can be used here in ggplot function. The X axis remain the same which is Year and y changes to the value. We group it by the variable and also give different color to both the lines. 
+<<lineusers,echo=false,fig=TRUE>>=
+
+ggplot(data=data.long, aes(x=YEAR, y=value, group=variable, colour=variable)) + geom_line() + geom_point()
+@
+\caption{Population And Users of India}
+\end{figure}
+
+
+
+\end{document}
